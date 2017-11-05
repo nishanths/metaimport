@@ -168,7 +168,7 @@ func main() {
 		}
 		f := filepath.Join(dir, "index.html")
 		if err := ioutil.WriteFile(f, file.contents.Bytes(), permFile); err != nil {
-			log.Fatalf("writing file %s: %s", filepath.Base(file.path), err)
+			log.Fatalf("writing file %s: %s", f, err)
 		}
 	}
 }

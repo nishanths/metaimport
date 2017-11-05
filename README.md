@@ -36,9 +36,6 @@ by go get. 'repo' specifies the Git repository containing Go source code to
 generate meta tags for. 'import' specifies the import path of the root of
 the repository.
 
-The program automatically handles generating HTML files for subpackages in the
-repository.
-
 Flags
    -branch   Branch to use (default: repository's default branch).
    -godoc    Include <meta name="go-source"> tag as expected by godoc.org.

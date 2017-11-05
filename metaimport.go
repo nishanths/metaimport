@@ -25,9 +25,6 @@ by go get. 'repo' specifies the Git repository containing Go source code to
 generate meta tags for. 'import' specifies the import path of the root of
 the repository.
 
-The program automatically handles generating HTML files for subpackages in the
-repository.
-
 Flags
    -branch   Branch to use (default: remote's default branch).
    -godoc    Include <meta name="go-source"> tag as expected by godoc.org.
@@ -117,16 +114,14 @@ func main() {
 		if d == "." {
 			d = ""
 		}
-		normalized := filepath.ToSlash(d)
-		fullImportPrefix := path.Join(baseImportPrefix, normalized)
+		forwardSlashed := filepath.ToSlash(d)
+		fullImportPrefix := path.Join(baseImportPrefix, forwardSlashed)
 		file := File{path: fullImportPrefix}
 
 		args := TemplateArgs{
-			// We could use the baseImportPrefix (or anything that's a prefix
-			// of fullImportPrefix) as the import prefix. But that would mean
-			// go get would perform an additional request. So use fullImportPrefix.
-			// See 'go help importpath' and https://npf.io/2016/10/vanity-imports-with-hugo/.
-			ImportPrefix: fullImportPrefix,
+			// See https://npf.io/2016/10/vanity-imports-with-hugo/ and Issue#1
+			// on GitHub, for why this shouldn't be fullImportPrefix.
+			ImportPrefix: baseImportPrefix,
 			VCS:          "git",
 			RepoRoot:     repoURL,
 		}

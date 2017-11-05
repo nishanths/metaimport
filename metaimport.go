@@ -255,7 +255,7 @@ const tmpl = `<!DOCTYPE html>
 		</style>
 	</head>
 	<body>
-		{{ .RepoRoot }}
+		<a href="{{ .RepoRoot }}">{{ .RepoRoot }}</a>
 	</body>
 </html>
 `

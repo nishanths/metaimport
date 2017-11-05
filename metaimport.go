@@ -16,7 +16,7 @@ import (
 	git "gopkg.in/src-d/go-git.v3"
 )
 
-const help = `usage: metaimport [-godoc] [-o dir] <import> <repo>
+const help = `usage: metaimport [-godoc] [-o dir] [-b branch] <import> <repo>
 
 metaimport generates HTML files with <meta name="go-import"> tags as expected
 by go get. 'repo' specifies the Git repository containing Go source code to
@@ -27,7 +27,7 @@ The program automatically handles generating HTML files for subpackages in the
 repository.
 
 Flags
-   -branch   Branch to use (default: repository's default branch).
+   -branch   Branch to use (default: remote's default branch).
    -godoc    Include <meta name="go-source"> tag as expected by godoc.org.
              Only partial support for repositories not hosted on github.com.
    -o        Directory to write generated HTML (default: html).

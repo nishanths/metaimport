@@ -1,5 +1,5 @@
 ```
-usage: metaimport [-godoc] [-o dir] <import> <repo>
+usage: metaimport [-godoc] [-o dir] [-branch branch] <import> <repo>
 
 metaimport generates HTML files with <meta name="go-import"> tags as expected
 by go get. 'repo' specifies the Git repository containing Go source code to

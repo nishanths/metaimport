@@ -151,15 +151,21 @@ func main() {
 		log.Fatalf("making directory %s: %s", *outputDir, err)
 	}
 
+	// Write output files.
 	for _, file := range files {
-		dir := filepath.Join(*outputDir, filepath.Dir(file.path))
+		// This would fail if the repository had a structure like:
+		//   a/
+		//     a.go
+		//     index.html/
+		//       b.go
+		// because we would need to have both 'a/index.html' and
+		// 'a/index.html/index.html'.
+		dir := filepath.Join(*outputDir, filepath.FromSlash(file.path))
 		if err := os.MkdirAll(dir, permDir); err != nil {
 			log.Fatalf("making directory %s: %s", dir, err)
 		}
-
-		f := filepath.Join(dir, filepath.Base(file.path))
-		err := ioutil.WriteFile(f, file.contents.Bytes(), permFile)
-		if err != nil {
+		f := filepath.Join(dir, "index.html")
+		if err := ioutil.WriteFile(f, file.contents.Bytes(), permFile); err != nil {
 			log.Fatalf("writing file %s: %s", filepath.Base(file.path), err)
 		}
 	}

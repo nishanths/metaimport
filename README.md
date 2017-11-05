@@ -1,5 +1,7 @@
 ## metaimport
 
+`go get github.com/nishanths/metaimport`
+
 Specify a Git repository, and `metaimport` will generate a directory of
 HTML files containing `<meta name="go-import">` tags for the Go packages
 in the repository, for your vanity URL.

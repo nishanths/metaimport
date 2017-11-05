@@ -239,8 +239,7 @@ func (d Default) home() string      { return d.repoURL }
 func (d Default) directory() string { return d.repoURL }
 func (d Default) file() string      { return d.repoURL }
 
-const tmpl = `
-<!DOCTYPE html>
+const tmpl = `<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8">

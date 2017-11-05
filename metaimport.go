@@ -14,6 +14,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	git "gopkg.in/src-d/go-git.v3"
 )
@@ -66,6 +67,7 @@ func main() {
 	baseImportPrefix := args[0]
 	repoURL := args[1]
 	htmlTmpl := template.Must(template.New("").Parse(tmpl))
+	useDefaultBranch := *branch == ""
 
 	repo, err := git.NewRepository(repoURL, nil)
 	if err != nil {
@@ -73,17 +75,17 @@ func main() {
 	}
 
 	// Pull branch.
-	if *branch == "" {
+	if useDefaultBranch {
 		err = repo.PullDefault()
 	} else {
-		err = repo.Pull("origin", fmt.Sprintf("refs/heads/%s", *branch))
+		err = repo.Pull(git.DefaultRemoteName, fmt.Sprintf("refs/heads/%s", *branch))
 	}
 	if err != nil {
 		log.Fatalf("pulling branch: %s", err)
 	}
 
 	// Get the tree for the HEAD of the branch.
-	head, err := repo.Head("origin") // why doesn't local head work?
+	head, err := repo.Head(git.DefaultRemoteName) // why doesn't local head work?
 	if err != nil {
 		log.Fatalf("getting HEAD: %s", err)
 	}
@@ -101,7 +103,7 @@ func main() {
 
 	var godocSpec GodocSpec // can be nil
 	if *godoc {
-		godocSpec = determineGodocSpec(repoURL, *branch, repo)
+		godocSpec = determineGodocSpec(repoURL, *branch, useDefaultBranch, repo)
 	}
 
 	type File struct {
@@ -185,13 +187,21 @@ func main() {
 //   directory: https://bitbucket.org/multicores/hw3/src/HEAD/q5/queue
 //   file and line: https://bitbucket.org/multicores/hw3/src/HEAD/q5/queue/LockQueue.java?fileviewer=file-view-default#LockQueue.java-11
 
-func determineGodocSpec(repoURL, requestedBranch string, repo *git.Repository) GodocSpec {
+func shortBranch(long string) string {
+	return strings.TrimPrefix(long, "refs/heads/")
+}
+
+func determineGodocSpec(repoURL, requestedBranch string, usedDefaultBranch bool, repo *git.Repository) GodocSpec {
 	if u, err := url.Parse(repoURL); err == nil {
 		switch u.Host {
 		case "github.com":
-			return GitHub{repoURL, requestedBranch}
+			b := requestedBranch
+			if usedDefaultBranch {
+				b = shortBranch(repo.Remotes[git.DefaultRemoteName].DefaultBranch())
+			}
+			return GitHub{repoURL, b}
 		case "bitbucket.org":
-			if repo.Remotes["origin"].DefaultBranch() == requestedBranch {
+			if usedDefaultBranch || shortBranch(repo.Remotes[git.DefaultRemoteName].DefaultBranch()) == requestedBranch {
 				return BitBucket{repoURL}
 			}
 		}
@@ -239,7 +249,7 @@ const tmpl = `<!DOCTYPE html>
 	<head>
 		<meta charset="utf-8">
 		<meta name="go-import" content="{{ .ImportPrefix }} {{ .VCS }} {{ .RepoRoot }}">
-		{{- with .GoSource }}<meta name="go-source" content="{{ .Prefix }} {{ .Home }} {{ .Directory }} {{ .File }}">{{ end }}
+		{{ with .GoSource }}<meta name="go-source" content="{{ .Prefix }} {{ .Home }} {{ .Directory }} {{ .File }}">{{ end }}
 		<style>
 			html { font-family: monospace; }
 		</style>

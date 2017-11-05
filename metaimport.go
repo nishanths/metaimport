@@ -19,12 +19,12 @@ import (
 	git "gopkg.in/src-d/go-git.v3"
 )
 
-const help = `usage: metaimport [-branch branch] [-godoc] [-o dir] <import> <repo>
+const help = `usage: metaimport [-branch branch] [-godoc] [-o dir] <import-prefix> <repo>
 
 metaimport generates HTML files with <meta name="go-import"> tags as expected
 by go get. 'repo' specifies the Git repository containing Go source code to
-generate meta tags for. 'import' specifies the import path of the root of
-the repository.
+generate meta tags for. 'import-prefix' is the import path corresponding to
+the repository root.
 
 Flags
    -branch   Branch to use (default: remote's default branch).
@@ -127,7 +127,7 @@ func main() {
 			VCS:          "git",
 			RepoRoot:     repoURL,
 		}
-		if godocSpec != nil {
+		if *godoc {
 			args.GoSource = &GoSource{
 				Prefix:    baseImportPrefix,
 				Home:      godocSpec.home(),
@@ -157,8 +157,8 @@ func main() {
 		//     a.go
 		//     index.html/
 		//       b.go
-		// because we would need to have both 'a/index.html' and
-		// 'a/index.html/index.html'.
+		// because we would need to have both 'a/index.html' (for the package at a)
+		// and 'a/index.html/index.html' (for package at a/index.html).
 		dir := filepath.Join(*outputDir, filepath.FromSlash(file.path))
 		if err := os.MkdirAll(dir, permDir); err != nil {
 			log.Fatalf("making directory %s: %s", dir, err)

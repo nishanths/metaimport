@@ -2,9 +2,9 @@
 
 `go get github.com/nishanths/metaimport`
 
-Specify a Git repository, and `metaimport` will generate a directory of
+Specify a Git repository and `metaimport` will generate a directory of
 HTML files containing `<meta name="go-import">` tags for the Go packages
-in the repository, for your vanity URL.
+in the repository, suited for your vanity URL.
 
 These tags are used by commands such as `go get` to determine how to fetch 
 source code. See `go help importpath` for details.
@@ -24,17 +24,19 @@ $ python -m SimpleHTTPServer 443
 $ go get example.org/myrepo # should now work
 ```
 
+You'll need certs for https, but you get the idea.
+
 ## Usage
 
 See `metaimport -h`.
 
 ```
-usage: metaimport [-branch branch] [-godoc] [-o dir] <import> <repo>
+usage: metaimport [-branch branch] [-godoc] [-o dir] <import-prefix> <repo>
 
 metaimport generates HTML files with <meta name="go-import"> tags as expected
 by go get. 'repo' specifies the Git repository containing Go source code to
-generate meta tags for. 'import' specifies the import path of the root of
-the repository.
+generate meta tags for. 'import-prefix' is the import path corresponding to
+the repository root.
 
 Flags
    -branch   Branch to use (default: repository's default branch).

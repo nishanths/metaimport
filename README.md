@@ -1,7 +1,8 @@
 ## metaimport
 
-Metaimport generates HTML files containing `<meta name="go-import">`
-tags for remote Git repositories. 
+Specify a Git repository, and `metaimport` will generate a directory of
+HTML files containing `<meta name="go-import">` tags for the Go packages
+in the repository, for your vanity URL.
 
 These tags are used by commands such as `go get` to determine how to fetch 
 source code. See `go help importpath` for details.
@@ -9,7 +10,7 @@ source code. See `go help importpath` for details.
 ## Example
 
 ```
-$ metaimport -o html example.org/myrepo github.com/user/myrepo
+$ metaimport -o html example.org/myrepo https://github.com/user/myrepo
 ```
 
 Once the HTML files are generated, you can serve them at the root of your domain 

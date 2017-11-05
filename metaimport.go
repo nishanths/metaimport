@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -25,10 +27,11 @@ The program automatically handles generating HTML files for subpackages in the
 repository.
 
 Flags
-   -branch   Branch to use (default: repository's default branch)
+   -branch   Branch to use (default: repository's default branch).
    -godoc    Include <meta name="go-source"> tag as expected by godoc.org.
              Only partial support for repositories not hosted on github.com.
-   -o        Directory to write generated HTML (default: metaimport)
+   -o        Directory to write generated HTML (default: html).
+             It creates the directory with 0744 permissions if it doesn't exist.
 
 Examples
    metaimport example.org/bar https://github.com/user/bar
@@ -40,13 +43,18 @@ func usage() {
 	os.Exit(2)
 }
 
+const (
+	permDir  = 0740
+	permFile = 0640
+)
+
 func main() {
 	log.SetFlags(0)
 	log.SetPrefix("metaimport: ")
 
 	godoc := flag.Bool("godoc", false, "")
 	branch := flag.String("branch", "", "")
-	ouputDir := flag.String("o", "metaimport", "")
+	outputDir := flag.String("o", "", "")
 
 	flag.Usage = usage
 	flag.Parse()
@@ -55,9 +63,9 @@ func main() {
 	if len(args) != 2 {
 		usage()
 	}
+
 	baseImportPrefix := args[0]
 	repoURL := args[1]
-
 	htmlTmpl := template.Must(template.New("").Parse(tmpl))
 
 	repo, err := git.NewRepository(repoURL, nil)
@@ -97,16 +105,26 @@ func main() {
 		godocSpec = determineGodocSpec(repoURL, *branch, repo)
 	}
 
-	_ = *ouputDir
+	type File struct {
+		path     string
+		contents bytes.Buffer
+	}
+	var files []File
 
 	for d := range dirs {
 		if d == "." {
 			d = ""
 		}
 		normalized := filepath.ToSlash(d)
+		fullImportPrefix := path.Join(baseImportPrefix, normalized)
+		file := File{path: fullImportPrefix}
 
 		args := TemplateArgs{
-			ImportPrefix: baseImportPrefix, // This can always be the base. See https://npf.io/2016/10/vanity-imports-with-hugo/.
+			// We could use the baseImportPrefix (or anything that's a prefix
+			// of fullImportPrefix) as the import prefix. But that would mean
+			// go get would perform an additional request. So use fullImportPrefix.
+			// See 'go help importpath' and https://npf.io/2016/10/vanity-imports-with-hugo/.
+			ImportPrefix: fullImportPrefix,
 			VCS:          "git",
 			RepoRoot:     repoURL,
 		}
@@ -119,9 +137,31 @@ func main() {
 			}
 		}
 
-		fullImportPrefix := path.Join(baseImportPrefix, normalized)
-		println(fullImportPrefix)
-		htmlTmpl.Execute(os.Stdout, args)
+		if err := htmlTmpl.Execute(&file.contents, args); err != nil {
+			log.Fatalf("executing template for path %s: %s", file.path, err)
+		}
+		files = append(files, file)
+	}
+
+	// Make the output directory.
+	if *outputDir == "" {
+		*outputDir = "html"
+	}
+	if err := os.MkdirAll(*outputDir, permDir); err != nil {
+		log.Fatalf("making directory %s: %s", *outputDir, err)
+	}
+
+	for _, file := range files {
+		dir := filepath.Join(*outputDir, filepath.Dir(file.path))
+		if err := os.MkdirAll(dir, permDir); err != nil {
+			log.Fatalf("making directory %s: %s", dir, err)
+		}
+
+		f := filepath.Join(dir, filepath.Base(file.path))
+		err := ioutil.WriteFile(f, file.contents.Bytes(), permFile)
+		if err != nil {
+			log.Fatalf("writing file %s: %s", filepath.Base(file.path), err)
+		}
 	}
 }
 

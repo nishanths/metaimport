@@ -184,9 +184,9 @@ func main() {
 //   directory: https://github.com/go-yaml/yaml/tree/some/directory
 //   file and line: https://github.com/go-yaml/yaml/blob/some/directory/somefile#L42
 //
-// Bitbucket's formats as of 2017-11-05 use the hash in the URL, but the hash
+// Bitbucket's formats as of 2017-11-05 has the hash in the URL, but the hash
 // can be substituted with HEAD to use the HEAD of the default branch. So
-// we can directory and file for go-source only if the default branch was pulled.
+// we can use the directory and file for godoc's tag only if the default branch was pulled.
 //   directory: https://bitbucket.org/multicores/hw3/src/HEAD/q5/queue
 //   file and line: https://bitbucket.org/multicores/hw3/src/HEAD/q5/queue/LockQueue.java?fileviewer=file-view-default#LockQueue.java-11
 

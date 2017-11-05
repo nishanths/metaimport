@@ -1,3 +1,5 @@
+// Command metaimport generates HTML files containing <meta name="go-import">
+// tags for remote Git repositories.
 package main
 
 import (
@@ -34,7 +36,7 @@ Flags
              It creates the directory with 0744 permissions if it doesn't exist.
 
 Examples
-   metaimport example.org/bar https://github.com/user/bar
+   metaimport example.org/myrepo https://github.com/user/myrepo
    metaimport example.org/exproj http://code.org/r/p/exproj
 `
 

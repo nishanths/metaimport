@@ -1,3 +1,28 @@
+## metaimport
+
+Metaimport generates HTML files containing `<meta name="go-import">`
+tags for remote Git repositories. 
+
+These tags are used by commands such as `go get` to determine how to fetch 
+source code. See `go help importpath` for details.
+
+## Example
+
+```
+$ metaimport -o html example.org/myrepo github.com/user/myrepo
+```
+
+Once the HTML files are generated, you can serve them at the root of your domain 
+(`example.org` in this example) with something like:
+
+```
+$ cd html/example.org
+$ python -m SimpleHTTPServer 443
+$ go get example.org/myrepo # should now work
+```
+
+## Usage
+
 ```
 usage: metaimport [-godoc] [-o dir] [-branch branch] <import> <repo>
 
@@ -15,8 +40,4 @@ Flags
              Only partial support for repositories not hosted on github.com.
    -o        Directory to write generated HTML (default: html).
              It creates the directory with 0744 permissions if it doesn't exist.
-
-Examples
-   metaimport example.org/bar https://github.com/user/bar
-   metaimport example.org/exproj http://code.org/r/p/exproj
 ```

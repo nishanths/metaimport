@@ -9,6 +9,9 @@ in the repository, suited for your vanity URL.
 These tags are used by commands such as `go get` to determine how to fetch 
 source code. See `go help importpath` for details.
 
+The program can also optionally create `<meta name="go-source">` tags, as used by 
+[godoc.org](https://github.com/golang/gddo/wiki/Source-Code-Links).
+
 ## Example
 
 ```

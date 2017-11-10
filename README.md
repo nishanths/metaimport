@@ -34,7 +34,7 @@ You'll need certs for https, but you get the idea.
 See `metaimport -h`.
 
 ```
-usage: metaimport [-branch branch] [-godoc] [-o dir] <import-prefix> <repo>
+usage: metaimport [-branch branch] [-godoc] [-o dir] [-redirect] <import-prefix> <repo>
 
 metaimport generates HTML files with <meta name="go-import"> tags as expected
 by go get. 'repo' specifies the Git repository containing Go source code to
@@ -42,9 +42,14 @@ generate meta tags for. 'import-prefix' is the import path corresponding to
 the repository root.
 
 Flags
-   -branch   Branch to use (default: repository's default branch).
-   -godoc    Include <meta name="go-source"> tag as expected by godoc.org.
-             Only partial support for repositories not hosted on github.com.
-   -o        Output directory for generated HTML files (default: html).
-             The directory is created with 0750 permissions if it doesn't exist.
+   -branch    Branch to use (default: remote's default branch).
+   -godoc     Include <meta name="go-source"> tag as expected by godoc.org (default: false).
+              Only partial support for repositories not hosted on github.com.
+   -o         Output directory for generated HTML files (default: html).
+              The directory is created with 0755 permissions if it doesn't exist.
+   -redirect  Redirect to godoc.org when visited in a browser (default: false).
+
+Examples
+   metaimport example.org/myrepo https://github.com/user/myrepo
+   metaimport example.org/exproj http://code.org/r/p/exproj
 ```

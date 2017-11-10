@@ -45,6 +45,6 @@ Flags
    -branch   Branch to use (default: repository's default branch).
    -godoc    Include <meta name="go-source"> tag as expected by godoc.org.
              Only partial support for repositories not hosted on github.com.
-   -o        Directory to write generated HTML files (default: html).
-             The directory is created with 0744 permissions if it doesn't exist.
+   -o        Output directory for generated HTML files (default: html).
+             The directory is created with 0750 permissions if it doesn't exist.
 ```

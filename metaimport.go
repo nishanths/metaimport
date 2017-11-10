@@ -32,7 +32,7 @@ Flags
               Only partial support for repositories not hosted on github.com.
    -o         Output directory for generated HTML files (default: html).
               The directory is created with 0755 permissions if it doesn't exist.
-   -redirect  Redirect to godoc.org when visited in a browser (default: false).
+   -redirect  Redirect to godoc.org documentation when visited in a browser (default: false).
 
 Examples
    metaimport example.org/myrepo https://github.com/user/myrepo
@@ -256,19 +256,16 @@ const tmpl = `<!DOCTYPE html>
 		<meta charset="utf-8">
 		{{ with .GoImport }}<meta name="go-import" content="{{ .ImportPrefix }} {{ .VCS }} {{ .RepoRoot }}">{{ end }}
 		{{ with .GoSource }}<meta name="go-source" content="{{ .Prefix }} {{ .Home }} {{ .Directory }} {{ .File }}">{{ end }}
-		{{ if .GodocRedirect }}<meta http-equiv="refresh" content="0;URL='{{ .GodocURL }}'" />{{ end }}
-		<style>
-			html { font-family: monospace; }
-		</style>
+		{{ if .GodocRedirect }}<meta http-equiv="refresh" content="0;URL='{{ .GodocURL }}'">{{ end }}
 	</head>
 	<body>
-		{{ if .GodocRedirect }}
-		Redirecting to <a href="{{ .GoImport.RepoRoot }}">{{ .GoImport.RepoRoot }}</a>
-		{{ else }}
+		{{ if .GodocRedirect -}}
+		Redirecting to documentation at <a href="{{ .GodocURL }}">{{ .GodocURL }}</a>
+		{{- else -}}
 		Repository: <a href="{{ .GoImport.RepoRoot }}">{{ .GoImport.RepoRoot }}</a>
 		<br>
 		Godoc: <a href="{{ .GodocURL }}">{{ .GodocURL }}</a>
-		{{ end }}
+		{{- end }}
 	</body>
 </html>
 `

@@ -27,11 +27,12 @@ generate meta tags for. 'import-prefix' is the import path corresponding to
 the repository root.
 
 Flags
-   -branch   Branch to use (default: remote's default branch).
-   -godoc    Include <meta name="go-source"> tag as expected by godoc.org.
-             Only partial support for repositories not hosted on github.com.
-   -o        Output directory for generated HTML files (default: html).
-             The directory is created with 0750 permissions if it doesn't exist.
+   -branch    Branch to use (default: remote's default branch).
+   -godoc     Include <meta name="go-source"> tag as expected by godoc.org.
+              Only partial support for repositories not hosted on github.com.
+   -o         Output directory for generated HTML files (default: html).
+              The directory is created with 0750 permissions if it doesn't exist.
+   -redirect  Redirect to godoc.org documentation when visited in a browser.
 
 Examples
    metaimport example.org/myrepo https://github.com/user/myrepo
@@ -55,6 +56,7 @@ func main() {
 	godoc := flag.Bool("godoc", false, "")
 	branch := flag.String("branch", "", "")
 	outputDir := flag.String("o", "", "")
+	godocRedirect := flag.Bool("redirect", false, "")
 
 	flag.Usage = usage
 	flag.Parse()
@@ -123,9 +125,13 @@ func main() {
 		args := TemplateArgs{
 			// See https://npf.io/2016/10/vanity-imports-with-hugo/ and Issue#1
 			// on GitHub, for why this shouldn't be fullImportPrefix.
-			ImportPrefix: baseImportPrefix,
-			VCS:          "git",
-			RepoRoot:     repoURL,
+			GoImport: GoImport{
+				ImportPrefix: baseImportPrefix,
+				VCS:          "git",
+				RepoRoot:     repoURL,
+			},
+			GodocURL:      fmt.Sprintf("https://godoc.org/%s", fullImportPrefix),
+			GodocRedirect: *godocRedirect,
 		}
 		if *godoc {
 			args.GoSource = &GoSource{
@@ -248,21 +254,34 @@ const tmpl = `<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8">
-		<meta name="go-import" content="{{ .ImportPrefix }} {{ .VCS }} {{ .RepoRoot }}">
+		{{ with .GoImport }}<meta name="go-import" content="{{ .ImportPrefix }} {{ .VCS }} {{ .RepoRoot }}">{{ end }}
 		{{ with .GoSource }}<meta name="go-source" content="{{ .Prefix }} {{ .Home }} {{ .Directory }} {{ .File }}">{{ end }}
+		{{ if .GodocRedirect }}<meta http-equiv="refresh" content="0;URL='{{ .GodocURL }}'" />{{ end }}
 		<style>
 			html { font-family: monospace; }
 		</style>
 	</head>
 	<body>
-		<a href="{{ .RepoRoot }}">{{ .RepoRoot }}</a>
+		{{ if .GodocRedirect }}
+		Redirecting to <a href="{{ .GoImport.RepoRoot }}">{{ .GoImport.RepoRoot }}</a>
+		{{ else }}
+		Repository: <a href="{{ .GoImport.RepoRoot }}">{{ .GoImport.RepoRoot }}</a>
+		<br>
+		Godoc: <a href="{{ .GodocURL }}">{{ .GodocURL }}</a>
+		{{ end }}
 	</body>
 </html>
 `
 
 type TemplateArgs struct {
+	GoImport      GoImport
+	GoSource      *GoSource
+	GodocRedirect bool
+	GodocURL      string
+}
+
+type GoImport struct {
 	ImportPrefix, VCS, RepoRoot string
-	GoSource                    *GoSource
 }
 
 type GoSource struct {

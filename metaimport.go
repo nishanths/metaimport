@@ -301,6 +301,10 @@ func packageDirs(tree *git.Tree) (map[string]struct{}, error) {
 			}
 			return nil, fmt.Errorf("getting next file in tree: %s", err)
 		}
+		// TODO: 'go help packages' says:
+		//   Directory and file names that begin with "." or "_" are ignored
+		//   by the go tool, as are directories named "testdata".
+		// Should we ignore these patterns here?
 		if filepath.Ext(f.Name) != ".go" {
 			// if it's not a go file we can't add the file's directory
 			// to dirs, so move on.

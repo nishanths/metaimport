@@ -26,11 +26,10 @@ will generate HTML files like:
   <head>
     <meta charset="utf-8">
     <meta name="go-import" content="example.org/myrepo git https://github.com/user/myrepo">
+    <meta http-equiv="refresh" content="0; url='https://godoc.org/example.org/myrepo'">
   </head>
   <body>
-    Repository: <a href="https://github.com/user/myrepo">https://github.com/user/myrepo</a>
-    <br>
-    Godoc: <a href="https://godoc.org/example.org/myrepo">https://godoc.org/example.org/myrepo</a>
+    Redirecting to <a href="https://godoc.org/example.org/myrepo">https://godoc.org/example.org/myrepo</a>
   </body>
 </html>
 ```
@@ -65,7 +64,7 @@ Flags
               Only partial support for repositories not hosted on github.com.
    -o         Output directory for generated HTML files (default: html).
               The directory is created with 0755 permissions if it doesn't exist.
-   -redirect  Redirect to godoc.org documentation when visited in a browser (default: false).
+   -redirect  Redirect to godoc.org documentation when visited in a browser (default: true).
 
 Examples
    metaimport example.org/myrepo https://github.com/user/myrepo

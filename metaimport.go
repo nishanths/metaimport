@@ -17,6 +17,7 @@ import (
 	"strings"
 
 	git "gopkg.in/src-d/go-git.v3"
+	gitcore "gopkg.in/src-d/go-git.v3/core"
 )
 
 const help = `usage: metaimport [-branch branch] [-godoc] [-o dir] [-redirect] <import-prefix> <repo>
@@ -87,7 +88,12 @@ func main() {
 	}
 
 	// Get the tree for the HEAD of the branch.
-	head, err := repo.Head(git.DefaultRemoteName) // why doesn't local head work?
+	var head gitcore.Hash
+	if useDefaultBranch {
+		head, err = repo.Head(git.DefaultRemoteName)
+	} else {
+		head, err = repo.Remotes[git.DefaultRemoteName].Ref(fmt.Sprintf("refs/heads/%s", *branch))
+	}
 	if err != nil {
 		log.Fatalf("getting HEAD: %s", err)
 	}
